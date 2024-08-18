@@ -10,7 +10,7 @@ const initialProcesses = [
   { id: 3, name: '梱包', status: '完了', progress: 100 },
 ];
 
-const statusColors = {
+const statusColors: { [key: string]: string } = {
   '進行中': 'bg-blue-500',
   '待機中': 'bg-yellow-500',
   '完了': 'bg-green-500',

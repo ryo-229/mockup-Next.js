@@ -11,7 +11,7 @@ const initialInventory = [
   { id: 4, name: 'インク', quantity: 50, unit: 'L', status: '危険' },
 ];
 
-const statusColors = {
+const statusColors: { [key: string]: string } = {
   '十分': 'bg-green-500',
   '要補充': 'bg-yellow-500',
   '危険': 'bg-red-500',

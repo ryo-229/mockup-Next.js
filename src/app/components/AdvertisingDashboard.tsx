@@ -11,7 +11,7 @@ const initialAds = [
   { id: 4, client: 'D株式会社', product: '季節商品', status: '完了', progress: 100 },
 ];
 
-const statusColors = {
+const statusColors: { [key: string]: string } = {
   '製作中': 'bg-blue-500',
   '承認待ち': 'bg-yellow-500',
   '印刷中': 'bg-purple-500',

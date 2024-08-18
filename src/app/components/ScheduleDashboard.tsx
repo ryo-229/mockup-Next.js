@@ -4,54 +4,33 @@ import React, { useState } from 'react';
 import { format, addDays, startOfWeek, isWithinInterval, isSameDay } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
+// Taskの型定義を追加
+interface Task {
+  id: number;
+  name: string;
+  startDate: Date;
+  endDate: Date;
+  status: string;
+  progress: number;
+}
+
 // モックデータ
-const initialTasks = [
-  { 
-    id: 1, 
-    name: 'ティッシュ製造', 
-    startDate: new Date(2024, 7, 20), 
-    endDate: new Date(2024, 7, 25), 
-    status: '進行中', 
-    progress: 50,
-    description: 'ティッシュの製造工程を管理します。',
-    assignee: '山田太郎',
-    priority: '高'
-  },
-  { 
-    id: 2, 
-    name: '広告デザイン', 
-    startDate: new Date(2024, 7, 22), 
-    endDate: new Date(2024, 7, 24), 
-    status: '未着手', 
-    progress: 0,
-    description: '新製品の広告デザインを作成します。',
-    assignee: '佐藤花子',
-    priority: '中'
-  },
-  { 
-    id: 3, 
-    name: '納品', 
-    startDate: new Date(2024, 7, 26), 
-    endDate: new Date(2024, 7, 26), 
-    status: '未着手', 
-    progress: 0,
-    description: '完成した製品を顧客に納品します。',
-    assignee: '鈴木一郎',
-    priority: '高'
-  },
+const initialTasks: Task[] = [
+  { id: 1, name: 'ティッシュ製造', startDate: new Date(2024, 7, 20), endDate: new Date(2024, 7, 25), status: '進行中', progress: 50 },
+  { id: 2, name: '広告デザイン', startDate: new Date(2024, 7, 22), endDate: new Date(2024, 7, 24), status: '未着手', progress: 0 },
+  { id: 3, name: '納品', startDate: new Date(2024, 7, 26), endDate: new Date(2024, 7, 26), status: '未着手', progress: 0 },
 ];
 
-const statusColors = {
-  '未着手': 'rgb(209, 213, 219)', // gray-300
-  '進行中': 'rgb(59, 130, 246)', // blue-500
-  '完了': 'rgb(34, 197, 94)', // green-500
-  '遅延': 'rgb(239, 68, 68)', // red-500
+const statusColors: { [key: string]: string } = {
+  '未着手': 'bg-gray-300',
+  '進行中': 'bg-blue-500',
+  '完了': 'bg-green-500',
+  '遅延': 'bg-red-500',
 };
 
 export default function ScheduleDashboard() {
-  const [tasks, setTasks] = useState(initialTasks);
-  const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
-  const [expandedTaskId, setExpandedTaskId] = useState<number | null>(null);
+  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [currentWeekStart, setCurrentWeekStart] = useState<Date>(startOfWeek(new Date(), { weekStartsOn: 1 }));
 
   const updateTaskStatus = (id: number, newStatus: string) => {
     setTasks(tasks.map(task => 
@@ -65,7 +44,7 @@ export default function ScheduleDashboard() {
     setCurrentWeekStart(addDays(currentWeekStart, direction * 7));
   };
 
-  const getTaskStyle = (task, day) => {
+  const getTaskStyle = (task: Task, day: Date) => {
     if (isWithinInterval(day, { start: task.startDate, end: task.endDate })) {
       let width = '100%';
       if (isSameDay(day, task.startDate)) {
@@ -86,7 +65,7 @@ export default function ScheduleDashboard() {
     return {};
   };
 
-  const getProgressStyle = (task, day) => {
+  const getProgressStyle = (task: Task, day: Date) => {
     if (isWithinInterval(day, { start: task.startDate, end: task.endDate })) {
       const totalDays = Math.floor((task.endDate.getTime() - task.startDate.getTime()) / (1000 * 3600 * 24)) + 1;
       const daysPassed = Math.floor((day.getTime() - task.startDate.getTime()) / (1000 * 3600 * 24)) + 1;
@@ -96,15 +75,11 @@ export default function ScheduleDashboard() {
       return {
         width: `${currentDayProgress}%`,
         height: '100%',
-        backgroundColor: statusColors[task.status as keyof typeof statusColors],
+        backgroundColor: statusColors[task.status],
         opacity: 0.7,
       };
     }
     return {};
-  };
-
-  const toggleTaskDetails = (taskId: number) => {
-    setExpandedTaskId(expandedTaskId === taskId ? null : taskId);
   };
 
   return (
@@ -147,8 +122,7 @@ export default function ScheduleDashboard() {
                     <select
                       value={task.status}
                       onChange={(e) => updateTaskStatus(task.id, e.target.value)}
-                      className="rounded px-2 py-1 text-white"
-                      style={{ backgroundColor: statusColors[task.status] }}
+                      className={`${statusColors[task.status]} text-white rounded px-2 py-1`}
                     >
                       <option value="未着手">未着手</option>
                       <option value="進行中">進行中</option>
@@ -166,23 +140,10 @@ export default function ScheduleDashboard() {
           <h2 className="text-xl font-semibold mb-4">タスク詳細</h2>
           <ul className="space-y-2">
             {tasks.map(task => (
-              <li key={task.id} className="bg-white rounded shadow">
-                <div 
-                  className="flex justify-between items-center p-3 cursor-pointer"
-                  onClick={() => toggleTaskDetails(task.id)}
-                >
-                  <span>{task.name}</span>
-                  <span>{format(task.startDate, 'yyyy/MM/dd')} - {format(task.endDate, 'yyyy/MM/dd')}</span>
-                  <span>進捗: {task.progress}%</span>
-                </div>
-                {expandedTaskId === task.id && (
-                  <div className="p-3 border-t">
-                    <p><strong>説明:</strong> {task.description}</p>
-                    <p><strong>担当者:</strong> {task.assignee}</p>
-                    <p><strong>優先度:</strong> {task.priority}</p>
-                    <p><strong>ステータス:</strong> {task.status}</p>
-                  </div>
-                )}
+              <li key={task.id} className="flex justify-between items-center bg-white p-3 rounded shadow">
+                <span>{task.name}</span>
+                <span>{format(task.startDate, 'yyyy/MM/dd')} - {format(task.endDate, 'yyyy/MM/dd')}</span>
+                <span>進捗: {task.progress}%</span>
               </li>
             ))}
           </ul>
