@@ -96,7 +96,7 @@ export default function ScheduleDashboard() {
       return {
         width: `${currentDayProgress}%`,
         height: '100%',
-        backgroundColor: statusColors[task.status],
+        backgroundColor: statusColors[task.status as keyof typeof statusColors],
         opacity: 0.7,
       };
     }

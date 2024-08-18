@@ -16,7 +16,7 @@ export default function Home() {
       <p className="text-xl text-gray-600 mb-8">
         効率的な製造プロセス、在庫管理、広告連携を実現する統合システムへようこそ。
       </p>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {features.map((feature, index) => (
           <div key={index} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
@@ -28,7 +28,7 @@ export default function Home() {
           </div>
         ))}
       </div>
-      
+
       <div className="mt-12 text-center">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">さあ、始めましょう</h2>
         <p className="text-gray-600 mb-6">
